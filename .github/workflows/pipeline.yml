@@ -10,6 +10,7 @@ jobs:
       runs-on: windows-latest
       environment: Test
       steps:
+        - uses: actions/checkout@v2
 
         - name: Installing Az.accounts for powershell
           shell: pwsh
