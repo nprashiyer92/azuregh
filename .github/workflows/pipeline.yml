@@ -24,9 +24,9 @@ jobs:
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTIONID }} 
             enable-AzPSSession: true
 
-        - run: |
-            echo "github.sha=$GITHUB_SHA"
-            docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }} .
+        - name: Docker Image Build
+          run: |
+          docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - uses: Azure/container-scan@v0 
           name: Scan image for vulnerabilities
@@ -37,7 +37,7 @@ jobs:
 
         - name: Push Docker image - myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
           run: |
-            docker push myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+          docker push myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - name: Post logs to appinsights
           uses: Azure/publish-security-assessments@v0
