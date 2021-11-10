@@ -26,7 +26,7 @@ jobs:
 
         - run: |
             echo "github.sha=$GITHUB_SHA"
-            docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+            docker build . -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - uses: Azure/container-scan@v0 
           name: Scan image for vulnerabilities
