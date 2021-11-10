@@ -1,0 +1,47 @@
+name: Azure Security Center Github Actions Integration Demo
+
+on: workflow_dispatch
+
+permissions:
+      id-token: write
+      
+jobs: 
+  Windows-latest:
+      runs-on: windows-latest
+      environment: Test
+      steps:
+
+        - name: Installing Az.accounts for powershell
+          shell: pwsh
+          run: |
+               Install-Module -Name Az.Accounts -Force -AllowClobber -Repository PSGallery
+  
+        - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+          uses: azure/login@v1.4.0
+          with:
+            client-id: ${{ secrets.AZURE_CLIENTID }}
+            tenant-id: ${{ secrets.AZURE_TENANTID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTIONID }} 
+            enable-AzPSSession: true
+
+        - run: |
+            echo "github.sha=$GITHUB_SHA"
+            docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+
+        - uses: Azure/container-scan@v0 
+          name: Scan image for vulnerabilities
+          id: container-scan
+          continue-on-error: true
+          with:
+            image-name: myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }} 
+
+        - name: Push Docker image - myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+          run: |
+            docker push myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+
+        - name: Post logs to appinsights
+          uses: Azure/publish-security-assessments@v0
+          with: 
+            scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
+            connection-string: ${{ secrets.AZ_APPINSIGHTS_CONNECTION_STRING }}
+            subscription-token: ${{ secrets.AZ_SUBSCRIPTION_TOKEN }}
