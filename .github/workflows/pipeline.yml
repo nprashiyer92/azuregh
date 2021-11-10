@@ -6,7 +6,7 @@ permissions:
       id-token: write
       
 jobs: 
-  Windows-latest:
+  Build-Image:
       runs-on: windows-latest
       environment: Test
       steps:
@@ -26,7 +26,7 @@ jobs:
 
         - name: Docker Image Build
           run: |
-          docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+            docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - uses: Azure/container-scan@v0 
           name: Scan image for vulnerabilities
@@ -37,7 +37,7 @@ jobs:
 
         - name: Push Docker image - myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
           run: |
-          docker push myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+            docker push myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - name: Post logs to appinsights
           uses: Azure/publish-security-assessments@v0
