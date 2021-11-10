@@ -24,9 +24,14 @@ jobs:
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTIONID }} 
             enable-AzPSSession: true
 
-        - name: Docker Image Build
-          run: |
-            docker build -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
+        - uses: azure/docker-login@v1
+          with:
+            login-server: contoso.azurecr.io
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+
+        - run: |
+            docker build . -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - uses: Azure/container-scan@v0 
           name: Scan image for vulnerabilities
