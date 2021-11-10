@@ -31,6 +31,9 @@ jobs:
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
         - run: |
+            ls
+            
+        - run: |
             docker build . -t myazsecdemoaacr.azurecr.io/azsecuritydemo:${{ github.sha }}
 
         - uses: Azure/container-scan@v0 
